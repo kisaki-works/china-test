@@ -1,4 +1,23 @@
 {
-  "rows": [],
-  "updatedAt": "2026-09-16T14:25:04.706Z"
+  "rows": [
+    {
+      "id": "r17895687737954sbaa",
+      "status": "",
+      "category": "",
+      "item": "",
+      "reqDate": "",
+      "no": "",
+      "productName": "",
+      "price": "",
+      "vendor": "",
+      "targetPrice": "",
+      "intent": "",
+      "assignee": "A",
+      "physicalSample": "",
+      "shipBranch": "",
+      "shipDate": "",
+      "note": ""
+    }
+  ],
+  "updatedAt": "2026-09-16T14:26:14.801Z"
 }
