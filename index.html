@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>협업 시트</title>
+<title>개발 의뢰 협업 시트</title>
 <style>
   * { box-sizing: border-box; }
   body {
@@ -11,193 +11,153 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", "Noto Sans SC", sans-serif;
     background: #f4f5f7;
     color: #1a1a1a;
+    font-size: 13px;
   }
   header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: #ffffff;
-    border-bottom: 1px solid #e5e7eb;
+    position: sticky; top: 0; z-index: 20;
+    background: #fff; border-bottom: 1px solid #e5e7eb;
     padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
+    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
   }
-  header h1 {
-    font-size: 15px;
-    margin: 0;
-    font-weight: 700;
-    white-space: nowrap;
+  header h1 { font-size: 15px; margin: 0; font-weight: 700; white-space: nowrap; }
+  .badge {
+    font-size: 11px; padding: 3px 8px; border-radius: 999px;
+    background: #eef2ff; color: #4338ca; font-weight: 600;
   }
-  #status {
-    font-size: 12px;
-    color: #666;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex: 1;
-    min-width: 200px;
-  }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #d1d5db;
-    flex-shrink: 0;
-  }
+  #status { font-size: 12px; color: #666; display: flex; align-items: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; flex-shrink: 0; }
   .dot.ok { background: #16a34a; }
   .dot.err { background: #dc2626; }
   .dot.busy { background: #f59e0b; }
+  .spacer { flex: 1; }
   button {
-    border: 1px solid #d1d5db;
-    background: #fff;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 13px;
-    cursor: pointer;
+    border: 1px solid #d1d5db; background: #fff; border-radius: 8px;
+    padding: 6px 12px; font-size: 12px; cursor: pointer; white-space: nowrap;
   }
   button:hover { background: #f3f4f6; }
   button.primary { background: #16a34a; color: #fff; border-color: #16a34a; }
   button.primary:hover { background: #15803d; }
-  #wrap {
-    overflow: auto;
-    height: calc(100vh - 53px);
-    padding: 16px;
-  }
-  table {
-    border-collapse: collapse;
-    background: #fff;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-  }
-  th, td {
-    border: 1px solid #e5e7eb;
-    padding: 0;
-    min-width: 90px;
-    height: 30px;
-  }
+  button.tab { border-radius: 999px; }
+  button.tab.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+  #wrap { overflow: auto; height: calc(100vh - 53px); padding: 14px; }
+  table { border-collapse: collapse; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.06); min-width: max-content; }
+  th, td { border: 1px solid #e5e7eb; padding: 0; height: 32px; }
   th {
-    background: #f0f1f3;
-    font-size: 12px;
-    color: #666;
-    position: sticky;
-    top: 0;
-    text-align: center;
-    padding: 4px;
+    background: #f0f1f3; font-size: 11px; color: #555; position: sticky; top: 0;
+    text-align: center; padding: 6px 4px; white-space: nowrap;
   }
-  td.rownum {
-    background: #f0f1f3;
-    font-size: 12px;
-    color: #666;
-    text-align: center;
-    position: sticky;
-    left: 0;
-    min-width: 36px;
-    width: 36px;
+  th.group-admin { background: #e0f2fe; color: #075985; }
+  th.group-worker { background: #fef3c7; color: #92400e; }
+  td input, td select {
+    width: 100%; height: 32px; border: none; outline: none;
+    padding: 0 6px; font-size: 12.5px; background: transparent; font-family: inherit;
   }
-  td input {
-    width: 100%;
-    height: 30px;
-    border: none;
-    outline: none;
-    padding: 0 8px;
-    font-size: 13px;
-    background: transparent;
-    font-family: inherit;
-  }
-  td input:focus {
-    background: #eff6ff;
-    outline: 2px solid #3b82f6;
-    outline-offset: -2px;
-  }
-  /* modal */
+  td input:focus, td select:focus { background: #eff6ff; outline: 2px solid #3b82f6; outline-offset: -2px; }
+  td input:disabled, td select:disabled { background: #f4f5f7; color: #888; cursor: not-allowed; }
+  td.col-admin { min-width: 100px; }
+  td.col-worker { min-width: 100px; }
+  .assignee-A { background: #fee2e2 !important; }
+  .assignee-B { background: #dbeafe !important; }
+  .assignee-C { background: #dcfce7 !important; }
+  td select.assignee-select { font-weight: 700; text-align: center; }
+
   #overlay {
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
+    position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+    display: flex; align-items: center; justify-content: center; z-index: 100;
   }
-  #modal {
-    background: #fff;
-    border-radius: 14px;
-    padding: 24px;
-    width: 90%;
-    max-width: 420px;
-    max-height: 85vh;
-    overflow: auto;
+  #overlay.hidden { display: none; }
+  .modal {
+    background: #fff; border-radius: 14px; padding: 24px;
+    width: 90%; max-width: 420px; max-height: 85vh; overflow: auto;
   }
-  #modal h2 { font-size: 16px; margin: 0 0 12px; }
-  #modal label {
-    display: block;
-    font-size: 12px;
-    color: #555;
-    margin: 12px 0 4px;
+  .modal h2 { font-size: 16px; margin: 0 0 12px; }
+  .modal label { display: block; font-size: 12px; color: #555; margin: 12px 0 4px; }
+  .modal input { width: 100%; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 13px; }
+  .modal p.hint { font-size: 12px; color: #888; margin: 4px 0 0; line-height: 1.5; }
+  .modal .actions { margin-top: 18px; display: flex; justify-content: flex-end; gap: 8px; }
+  .role-options { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+  .role-btn {
+    text-align: left; padding: 12px 14px; border-radius: 10px; border: 1px solid #d1d5db;
+    background: #fafafa; font-size: 13px; cursor: pointer;
   }
-  #modal input {
-    width: 100%;
-    padding: 8px 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 13px;
-  }
-  #modal p.hint {
-    font-size: 12px;
-    color: #888;
-    margin: 4px 0 0;
-    line-height: 1.5;
-  }
-  #modal .actions {
-    margin-top: 18px;
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-  }
-  #modal a { color: #2563eb; }
+  .role-btn:hover { background: #f0f0f0; }
+  .role-btn b { display: block; margin-bottom: 2px; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>📊 협업 시트</h1>
+  <h1>📋 개발 의뢰 협업 시트</h1>
+  <span class="badge" id="roleBadge">역할 미설정</span>
   <div id="status"><span class="dot" id="dot"></span><span id="statusText">설정이 필요합니다</span></div>
-  <button id="btnExport">JSON 내보내기</button>
-  <button id="btnImport">JSON 불러오기</button>
-  <button id="btnSettings">⚙ 설정</button>
+  <div class="spacer"></div>
+  <div id="adminTabs" style="display:none; gap:6px;">
+    <button class="tab active" data-filter="ALL">전체</button>
+    <button class="tab" data-filter="A">A만</button>
+    <button class="tab" data-filter="B">B만</button>
+    <button class="tab" data-filter="C">C만</button>
+  </div>
+  <button id="btnAddRow" style="display:none;">+ 행 추가</button>
+  <button id="btnRole">역할 변경</button>
+  <button id="btnSettings">⚙ 저장소 설정</button>
 </header>
 
 <div id="wrap">
-  <table id="grid"></table>
+  <table id="grid">
+    <thead>
+      <tr>
+        <th class="group-admin">진행상황</th>
+        <th class="group-admin">의뢰구분</th>
+        <th class="group-admin">개발항목</th>
+        <th class="group-admin">의뢰요청일</th>
+        <th class="group-admin">No</th>
+        <th class="group-admin">상품명</th>
+        <th class="group-admin">판매가</th>
+        <th class="group-admin">판매처</th>
+        <th class="group-admin">개발목표가</th>
+        <th class="group-admin">개발의도</th>
+        <th class="group-admin">담당자</th>
+        <th class="group-worker">실물여부</th>
+        <th class="group-worker">발송지사</th>
+        <th class="group-worker">발송일자</th>
+        <th class="group-worker">비고</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
 </div>
 
-<input type="file" id="fileInput" accept="application/json" style="display:none">
+<!-- role select modal -->
+<div id="roleOverlay" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:110;">
+  <div class="modal">
+    <h2>당신의 역할을 선택하세요</h2>
+    <p class="hint">이 브라우저에서 앞으로 어떤 화면을 보게 될지 결정합니다. 역할은 언제든 "역할 변경" 버튼으로 다시 바꿀 수 있어요.</p>
+    <div class="role-options">
+      <div class="role-btn" data-role="admin"><b>👑 관리자 (나)</b>모든 행 보기 · A~K 입력 · 담당자 지정</div>
+      <div class="role-btn" data-role="A"><b>🧑 담당자 A</b>A로 지정된 행만 보이고, 실물여부~비고만 입력</div>
+      <div class="role-btn" data-role="B"><b>🧑 담당자 B</b>B로 지정된 행만 보이고, 실물여부~비고만 입력</div>
+      <div class="role-btn" data-role="C"><b>🧑 담당자 C</b>C로 지정된 행만 보이고, 실물여부~비고만 입력</div>
+    </div>
+    <p class="hint" id="roleErr" style="color:#dc2626; display:none;">비밀번호가 틀렸습니다.</p>
+  </div>
+</div>
 
-<div id="overlay">
-  <div id="modal">
+<!-- github settings modal -->
+<div id="overlay" class="hidden">
+  <div class="modal">
     <h2>GitHub 연동 설정</h2>
-    <p class="hint">
-      이 시트는 GitHub 저장소에 데이터를 저장해서 여러 명이 동기화합니다.
-      아래 정보를 두 사람 모두 <b>동일하게</b> 입력해야 같은 데이터를 봅니다.
-    </p>
-
-    <label>저장소 소유자 (예: kisaki-works)</label>
+    <p class="hint">모든 사람(관리자, A, B, C)이 동일한 저장소 정보를 입력해야 같은 데이터를 봅니다.</p>
+    <label>저장소 소유자</label>
     <input id="inOwner" placeholder="kisaki-works">
-
-    <label>저장소 이름 (예: china-test)</label>
+    <label>저장소 이름</label>
     <input id="inRepo" placeholder="china-test">
-
-    <label>데이터 파일 경로 (기본값 그대로 두면 됨)</label>
-    <input id="inPath" placeholder="sheet-data.json" value="sheet-data.json">
-
+    <label>데이터 파일 경로</label>
+    <input id="inPath" placeholder="orders-data.json" value="orders-data.json">
     <label>Personal Access Token (쓰기 권한 필요)</label>
     <input id="inToken" type="password" placeholder="ghp_xxxxxxxxxxxx">
-    <p class="hint">
-      GitHub → 우측 프로필 → Settings → Developer settings → Personal access tokens →
-      Fine-grained tokens → Generate new token. Repository access는 이 저장소만 선택,
-      Permissions에서 <b>Contents: Read and write</b> 로 설정하세요.<br>
-      토큰은 이 브라우저에만 저장되며(localStorage), 저장소에 커밋되지 않습니다.
-      단, 이 페이지 소스를 보는 사람은 설정값을 볼 수 있으니 신뢰하는 사람과만 공유하세요.
-    </p>
-
+    <p class="hint">담당자 A/B/C도 이 저장소에 쓰기 권한이 있는 토큰이 필요합니다. 관리자가 발급한 토큰을 안전하게 전달하거나, 각자 발급받아도 됩니다.</p>
     <div class="actions">
       <button id="btnCancel">취소</button>
       <button class="primary" id="btnSave">저장하고 연결</button>
@@ -206,106 +166,67 @@
 </div>
 
 <script>
-const ROWS = 25;
-const COLS = 12; // A..L
-const COL_LETTERS = "ABCDEFGHIJKL".split("");
+// ⚠️ 관리자만 아는 값으로 바꿔서 업로드하세요. 각 사람에게 본인 역할의 비밀번호만 개별로 전달하세요.
+const ROLE_PASSCODES = {
+  admin: '111',
+  A: '222',
+  B: '333',
+  C: '444',
+};
 
-let state = {
+let role = localStorage.getItem('role') || '';
+let adminFilter = 'ALL';
+
+let gh = {
   owner: localStorage.getItem('gh_owner') || '',
   repo: localStorage.getItem('gh_repo') || '',
-  path: localStorage.getItem('gh_path') || 'sheet-data.json',
+  path: localStorage.getItem('gh_path') || 'orders-data.json',
   token: localStorage.getItem('gh_token') || '',
 };
 
-let grid = Array.from({length: ROWS}, () => Array(COLS).fill(''));
+let rows = [];
 let currentSha = null;
-let pollTimer = null;
-let saveTimer = null;
-let dirty = false;
-let editingCell = null; // {r,c} currently focused, to avoid overwriting while typing
+let pollTimer = null, saveTimer = null, dirty = false;
+let editingKey = null; // "rowId:field" being edited right now
 
-function buildGrid() {
-  const table = document.getElementById('grid');
-  table.innerHTML = '';
-  const thead = document.createElement('tr');
-  thead.innerHTML = '<th></th>' + COL_LETTERS.map(l => `<th>${l}</th>`).join('');
-  table.appendChild(thead);
-  for (let r = 0; r < ROWS; r++) {
-    const tr = document.createElement('tr');
-    const rowLabel = document.createElement('td');
-    rowLabel.className = 'rownum';
-    rowLabel.textContent = r + 1;
-    tr.appendChild(rowLabel);
-    for (let c = 0; c < COLS; c++) {
-      const td = document.createElement('td');
-      const input = document.createElement('input');
-      input.value = grid[r][c] || '';
-      input.dataset.r = r;
-      input.dataset.c = c;
-      input.addEventListener('focus', () => { editingCell = {r, c}; });
-      input.addEventListener('blur', () => { editingCell = null; });
-      input.addEventListener('input', (e) => {
-        grid[r][c] = e.target.value;
-        dirty = true;
-        setStatus('busy', '입력 중... (곧 저장)');
-        scheduleSave();
-      });
-      td.appendChild(input);
-      tr.appendChild(td);
-    }
-    table.appendChild(tr);
-  }
-}
+const FIELDS_ADMIN = ['status','category','item','reqDate','no','productName','price','vendor','targetPrice','intent'];
+const FIELDS_WORKER = ['physicalSample','shipBranch','shipDate','note'];
 
-function renderValuesOnly() {
-  // update input values without rebuilding DOM, skip the cell currently being edited
-  const inputs = document.querySelectorAll('#grid input');
-  inputs.forEach(inp => {
-    const r = Number(inp.dataset.r), c = Number(inp.dataset.c);
-    if (editingCell && editingCell.r === r && editingCell.c === c) return;
-    const v = grid[r][c] || '';
-    if (inp.value !== v) inp.value = v;
-  });
+function newRow() {
+  return {
+    id: 'r' + Date.now() + Math.random().toString(36).slice(2,7),
+    status:'', category:'', item:'', reqDate:'', no:'', productName:'',
+    price:'', vendor:'', targetPrice:'', intent:'', assignee:'A',
+    physicalSample:'', shipBranch:'', shipDate:'', note:''
+  };
 }
 
 function setStatus(kind, text) {
-  const dot = document.getElementById('dot');
-  dot.className = 'dot' + (kind ? ' ' + kind : '');
+  document.getElementById('dot').className = 'dot' + (kind ? ' ' + kind : '');
   document.getElementById('statusText').textContent = text;
 }
 
 function apiHeaders() {
   const h = { 'Accept': 'application/vnd.github+json' };
-  if (state.token) h['Authorization'] = 'token ' + state.token;
+  if (gh.token) h['Authorization'] = 'token ' + gh.token;
   return h;
 }
-
 function apiUrl() {
-  return `https://api.github.com/repos/${state.owner}/${state.repo}/contents/${encodeURIComponent(state.path)}`;
+  return `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/${encodeURIComponent(gh.path)}`;
 }
 
 async function loadFromGitHub() {
-  if (!state.owner || !state.repo) { setStatus(null, '설정이 필요합니다'); return; }
+  if (!gh.owner || !gh.repo) { setStatus(null, '저장소 설정이 필요합니다'); return; }
   setStatus('busy', '불러오는 중...');
   try {
     const res = await fetch(apiUrl() + '?t=' + Date.now(), { headers: apiHeaders() });
-    if (res.status === 404) {
-      // file doesn't exist yet -> create it
-      await saveToGitHub(true);
-      return;
-    }
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(res.status + ' ' + body.slice(0, 150));
-    }
+    if (res.status === 404) { await saveToGitHub(true); return; }
+    if (!res.ok) throw new Error(res.status + ' ' + (await res.text()).slice(0,150));
     const json = await res.json();
     currentSha = json.sha;
-    const content = decodeURIComponent(escape(atob(json.content.replace(/\n/g, ''))));
+    const content = decodeURIComponent(escape(atob(json.content.replace(/\n/g,''))));
     const parsed = JSON.parse(content);
-    if (Array.isArray(parsed.grid)) {
-      grid = parsed.grid;
-      renderValuesOnly();
-    }
+    if (Array.isArray(parsed.rows)) { rows = parsed.rows; renderRows(); }
     setStatus('ok', '동기화됨 · ' + new Date().toLocaleTimeString());
   } catch (err) {
     console.error(err);
@@ -314,15 +235,12 @@ async function loadFromGitHub() {
 }
 
 async function saveToGitHub(isCreate) {
-  if (!state.owner || !state.repo || !state.token) {
-    setStatus('err', '저장 권한(토큰)이 설정되지 않았습니다');
-    return;
-  }
+  if (!gh.owner || !gh.repo || !gh.token) { setStatus('err', '저장 권한(토큰)이 설정되지 않았습니다'); return; }
   setStatus('busy', '저장 중...');
   try {
     const payload = {
-      message: 'update sheet ' + new Date().toISOString(),
-      content: btoa(unescape(encodeURIComponent(JSON.stringify({ grid, updatedAt: new Date().toISOString() }, null, 2)))),
+      message: 'update orders ' + new Date().toISOString(),
+      content: btoa(unescape(encodeURIComponent(JSON.stringify({ rows, updatedAt: new Date().toISOString() }, null, 2)))),
     };
     if (!isCreate && currentSha) payload.sha = currentSha;
     const res = await fetch(apiUrl(), {
@@ -330,16 +248,8 @@ async function saveToGitHub(isCreate) {
       headers: { ...apiHeaders(), 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    if (res.status === 409 || res.status === 422) {
-      // sha conflict: reload latest, then retry once
-      await loadFromGitHub();
-      setStatus('err', '다른 사람이 먼저 저장함 - 다시 시도하세요');
-      return;
-    }
-    if (!res.ok) {
-      const body = await res.text();
-      throw new Error(res.status + ' ' + body.slice(0, 150));
-    }
+    if (res.status === 409 || res.status === 422) { await loadFromGitHub(); setStatus('err','다른 사람이 먼저 저장함 - 다시 시도'); return; }
+    if (!res.ok) throw new Error(res.status + ' ' + (await res.text()).slice(0,150));
     const json = await res.json();
     currentSha = json.content.sha;
     dirty = false;
@@ -354,75 +264,163 @@ function scheduleSave() {
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => { if (dirty) saveToGitHub(false); }, 1000);
 }
-
 function startPolling() {
   clearInterval(pollTimer);
-  const interval = state.token ? 5000 : 30000;
-  pollTimer = setInterval(() => {
-    if (!dirty) loadFromGitHub();
-  }, interval);
+  const interval = gh.token ? 5000 : 30000;
+  pollTimer = setInterval(() => { if (!dirty) loadFromGitHub(); }, interval);
 }
 
-function openModal() {
-  document.getElementById('inOwner').value = state.owner;
-  document.getElementById('inRepo').value = state.repo;
-  document.getElementById('inPath').value = state.path;
-  document.getElementById('inToken').value = state.token;
-  document.getElementById('overlay').style.display = 'flex';
-}
-function closeModal() {
-  document.getElementById('overlay').style.display = 'none';
+function canEditAdminCols() { return role === 'admin'; }
+function canEditWorkerCols(row) { return role === 'admin' || role === row.assignee; }
+
+function visibleRows() {
+  if (role === 'admin') {
+    if (adminFilter === 'ALL') return rows;
+    return rows.filter(r => r.assignee === adminFilter);
+  }
+  return rows.filter(r => r.assignee === role);
 }
 
-document.getElementById('btnSettings').onclick = openModal;
-document.getElementById('btnCancel').onclick = closeModal;
-document.getElementById('btnSave').onclick = () => {
-  state.owner = document.getElementById('inOwner').value.trim();
-  state.repo = document.getElementById('inRepo').value.trim();
-  state.path = document.getElementById('inPath').value.trim() || 'sheet-data.json';
-  state.token = document.getElementById('inToken').value.trim();
-  localStorage.setItem('gh_owner', state.owner);
-  localStorage.setItem('gh_repo', state.repo);
-  localStorage.setItem('gh_path', state.path);
-  localStorage.setItem('gh_token', state.token);
-  closeModal();
-  loadFromGitHub();
-  startPolling();
-};
+function makeCell(row, field, type) {
+  const td = document.createElement('td');
+  td.className = FIELDS_ADMIN.includes(field) ? 'col-admin' : 'col-worker';
+  const input = document.createElement('input');
+  input.value = row[field] || '';
+  input.disabled = type === 'admin' ? !canEditAdminCols() : !canEditWorkerCols(row);
+  const key = row.id + ':' + field;
+  input.addEventListener('focus', () => editingKey = key);
+  input.addEventListener('blur', () => editingKey = null);
+  input.addEventListener('input', (e) => {
+    row[field] = e.target.value;
+    dirty = true;
+    setStatus('busy', '입력 중... (곧 저장)');
+    scheduleSave();
+  });
+  td.appendChild(input);
+  return td;
+}
 
-document.getElementById('btnExport').onclick = () => {
-  const blob = new Blob([JSON.stringify({ grid }, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'sheet-backup.json';
-  a.click();
-};
-document.getElementById('btnImport').onclick = () => document.getElementById('fileInput').click();
-document.getElementById('fileInput').onchange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try {
-      const parsed = JSON.parse(reader.result);
-      if (Array.isArray(parsed.grid)) {
-        grid = parsed.grid;
-        renderValuesOnly();
+function makeAssigneeCell(row) {
+  const td = document.createElement('td');
+  td.className = 'col-admin assignee-' + row.assignee;
+  const select = document.createElement('select');
+  select.className = 'assignee-select';
+  ['A','B','C'].forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v;
+    if (row.assignee === v) opt.selected = true;
+    select.appendChild(opt);
+  });
+  select.disabled = !canEditAdminCols();
+  select.addEventListener('change', (e) => {
+    row.assignee = e.target.value;
+    dirty = true;
+    scheduleSave();
+    renderRows();
+  });
+  td.appendChild(select);
+  return td;
+}
+
+function renderRows() {
+  const tbody = document.getElementById('tbody');
+  tbody.innerHTML = '';
+  visibleRows().forEach(row => {
+    const tr = document.createElement('tr');
+    FIELDS_ADMIN.forEach(f => tr.appendChild(makeCell(row, f, 'admin')));
+    tr.appendChild(makeAssigneeCell(row));
+    FIELDS_WORKER.forEach(f => tr.appendChild(makeCell(row, f, 'worker')));
+    const tdDel = document.createElement('td');
+    if (role === 'admin') {
+      const btn = document.createElement('button');
+      btn.textContent = '삭제';
+      btn.onclick = () => {
+        if (!confirm('이 행을 삭제할까요?')) return;
+        rows = rows.filter(r => r.id !== row.id);
         dirty = true;
         scheduleSave();
-      }
-    } catch (err) { alert('JSON 파일을 읽을 수 없습니다: ' + err.message); }
+        renderRows();
+      };
+      tdDel.appendChild(btn);
+    }
+    tr.appendChild(tdDel);
+    tbody.appendChild(tr);
+  });
+}
+
+function applyRoleUI() {
+  const badge = document.getElementById('roleBadge');
+  const labels = { admin: '👑 관리자', A: '🧑 담당자 A', B: '🧑 담당자 B', C: '🧑 담당자 C' };
+  badge.textContent = labels[role] || '역할 미설정';
+  document.getElementById('adminTabs').style.display = role === 'admin' ? 'flex' : 'none';
+  document.getElementById('btnAddRow').style.display = role === 'admin' ? 'inline-block' : 'none';
+}
+
+document.querySelectorAll('.role-btn').forEach(btn => {
+  btn.onclick = () => {
+    const targetRole = btn.dataset.role;
+    const labels = { admin: '관리자', A: '담당자 A', B: '담당자 B', C: '담당자 C' };
+    const input = prompt(labels[targetRole] + ' 비밀번호를 입력하세요:');
+    const errEl = document.getElementById('roleErr');
+    if (input === null) return; // 취소
+    if (input !== ROLE_PASSCODES[targetRole]) {
+      errEl.style.display = 'block';
+      return;
+    }
+    errEl.style.display = 'none';
+    role = targetRole;
+    localStorage.setItem('role', role);
+    document.getElementById('roleOverlay').classList.add('hidden');
+    applyRoleUI();
+    renderRows();
   };
-  reader.readAsText(file);
+});
+document.getElementById('btnRole').onclick = () => document.getElementById('roleOverlay').classList.remove('hidden');
+
+document.querySelectorAll('#adminTabs .tab').forEach(btn => {
+  btn.onclick = () => {
+    adminFilter = btn.dataset.filter;
+    document.querySelectorAll('#adminTabs .tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderRows();
+  };
+});
+
+document.getElementById('btnAddRow').onclick = () => {
+  rows.push(newRow());
+  dirty = true;
+  scheduleSave();
+  renderRows();
 };
 
-buildGrid();
-if (state.owner && state.repo) {
+function openSettings() {
+  document.getElementById('inOwner').value = gh.owner;
+  document.getElementById('inRepo').value = gh.repo;
+  document.getElementById('inPath').value = gh.path;
+  document.getElementById('inToken').value = gh.token;
+  document.getElementById('overlay').classList.remove('hidden');
+}
+document.getElementById('btnSettings').onclick = openSettings;
+document.getElementById('btnCancel').onclick = () => document.getElementById('overlay').classList.add('hidden');
+document.getElementById('btnSave').onclick = () => {
+  gh.owner = document.getElementById('inOwner').value.trim();
+  gh.repo = document.getElementById('inRepo').value.trim();
+  gh.path = document.getElementById('inPath').value.trim() || 'orders-data.json';
+  gh.token = document.getElementById('inToken').value.trim();
+  localStorage.setItem('gh_owner', gh.owner);
+  localStorage.setItem('gh_repo', gh.repo);
+  localStorage.setItem('gh_path', gh.path);
+  localStorage.setItem('gh_token', gh.token);
+  document.getElementById('overlay').classList.add('hidden');
   loadFromGitHub();
   startPolling();
-} else {
-  openModal();
-}
+};
+
+// init
+applyRoleUI();
+if (!role) document.getElementById('roleOverlay').classList.remove('hidden');
+if (gh.owner && gh.repo) { loadFromGitHub(); startPolling(); }
+else openSettings();
 </script>
 </body>
 </html>
