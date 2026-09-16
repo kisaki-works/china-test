@@ -12,7 +12,7 @@
       "vendor": "",
       "targetPrice": "",
       "intent": "",
-      "assignee": "A",
+      "assignee": "B",
       "physicalSample": "",
       "shipBranch": "",
       "shipDate": "",
@@ -361,5 +361,5 @@
       "note": ""
     }
   ],
-  "updatedAt": "2026-09-16T14:26:19.154Z"
+  "updatedAt": "2026-09-16T14:26:24.237Z"
 }
