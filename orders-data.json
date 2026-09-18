@@ -6,7 +6,7 @@
       "category": "ㄴㅇㄴㅇ",
       "item": "",
       "reqDate": "",
-      "no": "ㄴㅇㄴㅇㄴㅇㅁㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㅇㄴㅁㄴㅇㅁㄴㅇ",
+      "no": "",
       "productName": "",
       "price": "",
       "vendor": "",
@@ -24,8 +24,8 @@
       "category": "",
       "item": "",
       "reqDate": "",
-      "no": "은ㄴㅇ",
-      "productName": "",
+      "no": "",
+      "productName": "안녕",
       "price": "",
       "vendor": "",
       "targetPrice": "",
@@ -361,5 +361,5 @@
       "note": ""
     }
   ],
-  "updatedAt": "2026-09-18T08:55:57.529Z"
+  "updatedAt": "2026-09-18T08:56:02.952Z"
 }
