@@ -1,24 +1,6 @@
 {
   "rows": [
     {
-      "id": "r17895687737954sbaa",
-      "status": "ㅇㄴㅇ",
-      "category": "ㄴㅇㄴㅇ",
-      "item": "",
-      "reqDate": "",
-      "no": "",
-      "productName": "",
-      "price": "",
-      "vendor": "",
-      "targetPrice": "",
-      "intent": "",
-      "assignee": "A",
-      "physicalSample": "",
-      "shipBranch": "",
-      "shipDate": "",
-      "note": ""
-    },
-    {
       "id": "r1789568774870vw321",
       "status": "",
       "category": "",
@@ -361,5 +343,5 @@
       "note": ""
     }
   ],
-  "updatedAt": "2026-09-18T08:56:15.749Z"
+  "updatedAt": "2026-09-18T08:57:05.369Z"
 }
